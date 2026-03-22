@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RoadMap — Visual Project Planning | BlackRoad OS</title>
+<meta name="description" content="Gantt charts, kanban boards, dependency tracking, AI-powered timeline estimation. Built for software teams managing multiple repos.">
+<meta name="theme-color" content="#000000">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --gradient: linear-gradient(90deg, #FF6B2B, #FF2255, #CC00AA, #8844FF, #4488FF, #00D4FF);
+  --bg: #000000; --surface: #0a0a0a; --border: #1a1a1a; --text: #e0e0e0;
+  --text-dim: #888888; --heading: #ffffff;
+  --font-heading: 'Space Grotesk', sans-serif; --font-mono: 'JetBrains Mono', monospace;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-heading); line-height: 1.7; overflow-x: hidden; }
+.gradient-text { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.9); border-bottom: 1px solid var(--border); }
+nav .logo { font-family: var(--font-heading); font-weight: 700; font-size: 1.4rem; color: var(--heading); text-decoration: none; }
+nav .logo span { font-weight: 300; color: var(--text-dim); }
+nav .nav-links { display: flex; gap: 2rem; align-items: center; }
+nav .nav-links a { color: var(--text-dim); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.3s; }
+nav .nav-links a:hover { color: var(--heading); }
+
+.btn-primary { display: inline-block; padding: 0.6rem 1.5rem; background: var(--gradient); color: #000; font-weight: 600; font-size: 0.9rem; border: none; border-radius: 6px; text-decoration: none; cursor: pointer; transition: opacity 0.3s; }
+.btn-primary:hover { opacity: 0.9; }
+.btn-secondary { display: inline-block; padding: 0.6rem 1.5rem; background: transparent; color: var(--text); font-weight: 500; font-size: 0.9rem; border: 1px solid var(--border); border-radius: 6px; text-decoration: none; cursor: pointer; transition: border-color 0.3s, color 0.3s; }
+.btn-secondary:hover { border-color: #444; color: var(--heading); }
+
+.hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 8rem 2rem 4rem; position: relative; }
+.hero::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 800px; height: 800px; background: radial-gradient(ellipse at center, rgba(204,0,170,0.06) 0%, transparent 70%); pointer-events: none; }
+.hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4rem 1rem; border: 1px solid var(--border); border-radius: 100px; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 2rem; font-family: var(--font-mono); }
+.hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #00ff88; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.hero h1 { font-family: var(--font-heading); font-size: clamp(3rem, 7vw, 6rem); font-weight: 700; line-height: 1.1; color: var(--heading); margin-bottom: 1.5rem; max-width: 900px; }
+.hero .subtitle { font-size: clamp(1.1rem, 2vw, 1.4rem); color: var(--text-dim); max-width: 650px; margin-bottom: 3rem; line-height: 1.8; }
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; }
+.hero-stats { display: flex; gap: 3rem; margin-top: 4rem; padding-top: 3rem; border-top: 1px solid var(--border); }
+.hero-stats .stat { text-align: center; }
+.hero-stats .stat-value { font-family: var(--font-mono); font-size: 2rem; font-weight: 700; color: var(--heading); }
+.hero-stats .stat-label { font-size: 0.8rem; color: var(--text-dim); margin-top: 0.3rem; }
+
+section { padding: 6rem 2rem; max-width: 1200px; margin: 0 auto; }
+section h2 { font-family: var(--font-heading); font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; color: var(--heading); margin-bottom: 1rem; }
+section .section-sub { font-size: 1.1rem; color: var(--text-dim); max-width: 600px; margin-bottom: 3rem; }
+.gradient-line { height: 1px; background: var(--gradient); opacity: 0.3; margin: 0 auto; max-width: 1200px; }
+
+.features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+.feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; transition: border-color 0.3s; }
+.feature-card:hover { border-color: #333; }
+.feature-card .icon { width: 48px; height: 48px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.2rem; background: #111; border: 1px solid var(--border); }
+.feature-card h3 { font-family: var(--font-heading); font-size: 1.2rem; font-weight: 600; color: var(--heading); margin-bottom: 0.8rem; }
+.feature-card p { color: var(--text-dim); font-size: 0.95rem; line-height: 1.7; }
+
+/* Gantt Chart Preview */
+.gantt-preview { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 3rem auto; max-width: 900px; overflow-x: auto; }
+.gantt-preview h4 { font-family: var(--font-heading); font-weight: 600; color: var(--heading); margin-bottom: 1.5rem; font-size: 1rem; }
+.gantt-header { display: grid; grid-template-columns: 180px repeat(12, 1fr); gap: 0; margin-bottom: 0.5rem; }
+.gantt-header .month { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); text-align: center; padding: 0.3rem; }
+.gantt-row { display: grid; grid-template-columns: 180px repeat(12, 1fr); gap: 0; margin-bottom: 0.3rem; align-items: center; }
+.gantt-row .task-name { font-size: 0.85rem; color: var(--text); padding-right: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gantt-row .task-bar { height: 24px; border-radius: 4px; position: relative; }
+.gantt-row .task-bar.design { background: linear-gradient(90deg, #FF6B2B, #FF2255); }
+.gantt-row .task-bar.dev { background: linear-gradient(90deg, #CC00AA, #8844FF); }
+.gantt-row .task-bar.test { background: linear-gradient(90deg, #4488FF, #00D4FF); }
+.gantt-row .task-bar.launch { background: linear-gradient(90deg, #00D4FF, #00ff88); }
+.gantt-cell { border-right: 1px solid #0d0d0d; height: 24px; }
+
+/* Kanban Preview */
+.kanban-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 3rem auto; max-width: 1000px; }
+.kanban-column { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.2rem; }
+.kanban-column .col-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border); }
+.kanban-column .col-title { font-family: var(--font-heading); font-size: 0.85rem; font-weight: 600; color: var(--heading); }
+.kanban-column .col-count { font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-dim); background: #111; padding: 0.15rem 0.5rem; border-radius: 3px; }
+.kanban-card { background: #0d0d0d; border: 1px solid #151515; border-radius: 8px; padding: 0.8rem; margin-bottom: 0.5rem; }
+.kanban-card .card-title { font-size: 0.8rem; color: var(--text); margin-bottom: 0.4rem; }
+.kanban-card .card-meta { display: flex; gap: 0.5rem; align-items: center; }
+.kanban-card .card-tag { font-family: var(--font-mono); font-size: 0.65rem; padding: 0.1rem 0.4rem; border-radius: 3px; }
+.kanban-card .card-tag.feat { background: rgba(136,68,255,0.15); color: #8844FF; }
+.kanban-card .card-tag.bug { background: rgba(255,34,85,0.15); color: #FF2255; }
+.kanban-card .card-tag.infra { background: rgba(0,212,255,0.15); color: #00D4FF; }
+.kanban-card .card-tag.docs { background: rgba(0,255,136,0.15); color: #00ff88; }
+.kanban-card .card-assignee { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); margin-left: auto; }
+
+/* Code Demo */
+.code-demo { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin: 3rem auto; max-width: 850px; }
+.code-demo .code-header { display: flex; align-items: center; gap: 0.5rem; padding: 0.8rem 1.2rem; border-bottom: 1px solid var(--border); }
+.code-demo .code-header .dot-r { width: 12px; height: 12px; border-radius: 50%; background: #ff5f57; }
+.code-demo .code-header .dot-y { width: 12px; height: 12px; border-radius: 50%; background: #ffbd2e; }
+.code-demo .code-header .dot-g { width: 12px; height: 12px; border-radius: 50%; background: #28c840; }
+.code-demo .code-header span { margin-left: auto; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); }
+.code-demo pre { padding: 1.5rem; font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.8; color: var(--text); overflow-x: auto; }
+.code-demo .keyword { color: #CC00AA; }
+.code-demo .string { color: #00D4FF; }
+.code-demo .comment { color: #555; }
+.code-demo .function { color: #FF6B2B; }
+
+/* Integration cards */
+.integration-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 2rem; }
+.integration-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; text-align: center; transition: border-color 0.3s; }
+.integration-card:hover { border-color: #333; }
+.integration-card .int-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+.integration-card .int-name { font-family: var(--font-heading); font-size: 0.95rem; font-weight: 600; color: var(--heading); margin-bottom: 0.3rem; }
+.integration-card .int-desc { font-size: 0.8rem; color: var(--text-dim); }
+
+/* Pricing */
+.pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+.pricing-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2.5rem; position: relative; }
+.pricing-card.featured { border-color: #333; }
+.pricing-card.featured::before { content: 'Most Popular'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); padding: 0.3rem 1rem; background: var(--gradient); color: #000; font-size: 0.75rem; font-weight: 700; border-radius: 100px; font-family: var(--font-mono); }
+.pricing-card .plan-name { font-family: var(--font-heading); font-size: 1.2rem; font-weight: 600; color: var(--heading); margin-bottom: 0.5rem; }
+.pricing-card .plan-price { font-family: var(--font-mono); font-size: 2.5rem; font-weight: 700; color: var(--heading); margin-bottom: 0.3rem; }
+.pricing-card .plan-price span { font-size: 1rem; color: var(--text-dim); font-weight: 400; }
+.pricing-card .plan-desc { font-size: 0.9rem; color: var(--text-dim); margin-bottom: 2rem; }
+.pricing-card .plan-features { list-style: none; display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 2rem; }
+.pricing-card .plan-features li { font-size: 0.9rem; color: var(--text); display: flex; align-items: center; gap: 0.6rem; }
+.pricing-card .plan-features li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #00ff88; flex-shrink: 0; }
+
+.tech-list { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 2rem; }
+.tech-tag { padding: 0.5rem 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-dim); }
+
+.install-block { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin: 3rem auto; max-width: 600px; }
+.install-block h4 { font-family: var(--font-heading); font-size: 1rem; font-weight: 600; color: var(--heading); margin-bottom: 1rem; }
+.install-block pre { font-family: var(--font-mono); font-size: 0.85rem; color: #00D4FF; line-height: 1.8; }
+
+.cta-section { text-align: center; padding: 6rem 2rem; max-width: 800px; margin: 0 auto; }
+.cta-section h2 { margin-bottom: 1rem; }
+.cta-section p { color: var(--text-dim); font-size: 1.1rem; margin-bottom: 2rem; }
+.cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+footer { padding: 3rem 2rem; border-top: 1px solid var(--border); text-align: center; }
+footer .footer-brand { font-family: var(--font-heading); font-weight: 700; font-size: 1.2rem; color: var(--heading); margin-bottom: 0.5rem; }
+footer .footer-tagline { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1.5rem; }
+footer .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; }
+footer .footer-links a { font-size: 0.8rem; color: var(--text-dim); text-decoration: none; transition: color 0.3s; }
+footer .footer-links a:hover { color: var(--heading); }
+footer .footer-copy { margin-top: 2rem; font-size: 0.75rem; color: #444; }
+
+@media (max-width: 768px) {
+  nav .nav-links { display: none; }
+  .hero-stats { flex-direction: column; gap: 1.5rem; }
+  .features-grid, .pricing-grid, .kanban-preview, .integration-grid { grid-template-columns: 1fr; }
+  .gantt-preview { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="logo">RoadMap <span>by BlackRoad</span></a>
+  <div class="nav-links">
+    <a href="#features">Features</a>
+    <a href="#views">Views</a>
+    <a href="#integrations">Integrations</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#install" class="btn-primary">Get Started</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-badge"><span class="dot"></span> v1.0 — Visual Project Planning</div>
+  <h1>See the road <span class="gradient-text">ahead</span></h1>
+  <p class="subtitle">
+    Gantt charts, kanban boards, dependency tracking, and AI-powered timeline estimation.
+    Built for software teams managing multiple repos. Integrates with Gitea and GitHub issues.
+    Plan visually, ship on time.
+  </p>
+  <div class="hero-actions">
+    <a href="#install" class="btn-primary">Start Planning Free</a>
+    <a href="#features" class="btn-secondary">See features</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-value">3</div><div class="stat-label">View Modes</div></div>
+    <div class="stat"><div class="stat-value">AI</div><div class="stat-label">Timeline Estimation</div></div>
+    <div class="stat"><div class="stat-value">2-way</div><div class="stat-label">Git Issue Sync</div></div>
+    <div class="stat"><div class="stat-value">&infin;</div><div class="stat-label">Dependency Chains</div></div>
+  </div>
+</section>
+
+<div class="gradient-line"></div>
+
+<!-- Gantt Chart Preview -->
+<section>
+  <h2>Gantt charts that <span class="gradient-text">actually help</span></h2>
+  <p class="section-sub">Visualize dependencies, track progress, identify bottlenecks at a glance.</p>
+
+  <div class="gantt-preview">
+    <h4>BlackRoad OS v3.0 Release Plan</h4>
+    <div class="gantt-header">
+      <div></div>
+      <div class="month">Jan</div><div class="month">Feb</div><div class="month">Mar</div>
+      <div class="month">Apr</div><div class="month">May</div><div class="month">Jun</div>
+      <div class="month">Jul</div><div class="month">Aug</div><div class="month">Sep</div>
+      <div class="month">Oct</div><div class="month">Nov</div><div class="month">Dec</div>
+    </div>
+    <div class="gantt-row">
+      <div class="task-name">Architecture Design</div>
+      <div class="task-bar design" style="grid-column: 2/4;"></div>
+      <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+      <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+      <div class="gantt-cell"></div><div class="gantt-cell"></div>
+    </div>
+    <div class="gantt-row">
+      <div class="task-name">Core Engine</div>
+      <div class="gantt-cell"></div>
+      <div class="task-bar dev" style="grid-column: 3/7;"></div>
+      <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+      <div class="gantt-cell"></div><div class="gantt-cell"></div>
+    </div>
+    <div class="gantt-row">
+      <div class="task-name">Security Hardening</div>
+      <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+      <div class="gantt-cell"></div>
+      <div class="task-bar dev" style="grid-column: 6/9;"></div>
+      <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+    </div>
+    <div class="gantt-row">
+      <div class="task-name">Integration Tests</div>
+      <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+      <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+      <div class="task-bar test" style="grid-column: 8/11;"></div>
+      <div class="gantt-cell"></div>
+    </div>
+    <div class="gantt-row">
+      <div class="task-name">Beta Launch</div>
+      <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+      <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+      <div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div>
+      <div class="task-bar launch" style="grid-column: 11/13;"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Kanban Preview -->
+<section id="views">
+  <h2>Kanban boards for <span class="gradient-text">daily work</span></h2>
+  <p class="section-sub">Drag cards, track status, see who's working on what.</p>
+
+  <div class="kanban-preview">
+    <div class="kanban-column">
+      <div class="col-header"><span class="col-title">Backlog</span><span class="col-count">4</span></div>
+      <div class="kanban-card">
+        <div class="card-title">Add CRDT sync to user model</div>
+        <div class="card-meta"><span class="card-tag feat">feature</span><span class="card-assignee">@claude</span></div>
+      </div>
+      <div class="kanban-card">
+        <div class="card-title">Migrate DNS to PowerDNS</div>
+        <div class="card-meta"><span class="card-tag infra">infra</span><span class="card-assignee">@road</span></div>
+      </div>
+      <div class="kanban-card">
+        <div class="card-title">Fix WireGuard keepalive on Aria</div>
+        <div class="card-meta"><span class="card-tag bug">bug</span><span class="card-assignee">unassigned</span></div>
+      </div>
+      <div class="kanban-card">
+        <div class="card-title">Write API documentation</div>
+        <div class="card-meta"><span class="card-tag docs">docs</span><span class="card-assignee">@mistral</span></div>
+      </div>
+    </div>
+    <div class="kanban-column">
+      <div class="col-header"><span class="col-title">In Progress</span><span class="col-count">3</span></div>
+      <div class="kanban-card">
+        <div class="card-title">Build memory collaboration system</div>
+        <div class="card-meta"><span class="card-tag feat">feature</span><span class="card-assignee">@claude</span></div>
+      </div>
+      <div class="kanban-card">
+        <div class="card-title">Deploy RoundTrip to production</div>
+        <div class="card-meta"><span class="card-tag infra">infra</span><span class="card-assignee">@road</span></div>
+      </div>
+      <div class="kanban-card">
+        <div class="card-title">CrowdSec scenario tuning</div>
+        <div class="card-meta"><span class="card-tag infra">infra</span><span class="card-assignee">@alice</span></div>
+      </div>
+    </div>
+    <div class="kanban-column">
+      <div class="col-header"><span class="col-title">Review</span><span class="col-count">2</span></div>
+      <div class="kanban-card">
+        <div class="card-title">Audit trail for agent actions</div>
+        <div class="card-meta"><span class="card-tag feat">feature</span><span class="card-assignee">@gpt4</span></div>
+      </div>
+      <div class="kanban-card">
+        <div class="card-title">Update brand colors across sites</div>
+        <div class="card-meta"><span class="card-tag docs">docs</span><span class="card-assignee">@pixel</span></div>
+      </div>
+    </div>
+    <div class="kanban-column">
+      <div class="col-header"><span class="col-title">Done</span><span class="col-count">5</span></div>
+      <div class="kanban-card">
+        <div class="card-title">Self-hosted Workers (15/15)</div>
+        <div class="card-meta"><span class="card-tag infra">infra</span><span class="card-assignee">@octavia</span></div>
+      </div>
+      <div class="kanban-card">
+        <div class="card-title">Truth audit v2 complete</div>
+        <div class="card-meta"><span class="card-tag docs">docs</span><span class="card-assignee">@claude</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="gradient-line"></div>
+
+<!-- Features -->
+<section id="features">
+  <h2>Planning tools that <span class="gradient-text">understand code</span></h2>
+  <p class="section-sub">Not just a pretty chart. RoadMap understands your git history, issues, and PRs.</p>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="icon">&#128202;</div>
+      <h3>Gantt Charts</h3>
+      <p>Interactive timeline visualization with drag-to-resize tasks, dependency arrows, critical path highlighting, and milestone markers. Zoom from day view to year view with a scroll.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#128196;</div>
+      <h3>Kanban Boards</h3>
+      <p>Drag-and-drop cards across customizable columns. WIP limits, swimlanes by assignee or repo, auto-archive completed tasks. Syncs bidirectionally with Gitea and GitHub issues.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#128279;</div>
+      <h3>Dependency Tracking</h3>
+      <p>Define task dependencies with finish-to-start, start-to-start, and finish-to-finish relationships. Automatic critical path calculation. Cascade delay warnings when blockers slip.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#129504;</div>
+      <h3>AI Timeline Estimation</h3>
+      <p>Analyze your historical commit velocity, PR merge times, and issue resolution patterns to predict realistic timelines. No more "this will take two weeks" turning into two months.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#128301;</div>
+      <h3>Multi-Repo Views</h3>
+      <p>See work across all your repositories in a single unified view. Track a feature that spans the frontend, backend, and infrastructure repos as one cohesive project.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#128200;</div>
+      <h3>Velocity Metrics</h3>
+      <p>Track throughput, cycle time, lead time, and burndown across sprints. Historical comparison shows if your team is accelerating or hitting friction. Per-assignee and per-repo breakdowns.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Code Demo -->
+<section>
+  <div class="code-demo">
+    <div class="code-header">
+      <div class="dot-r"></div><div class="dot-y"></div><div class="dot-g"></div>
+      <span>roadmap.config.ts</span>
+    </div>
+    <pre><span class="comment">// RoadMap — visual project planning with git integration</span>
+<span class="keyword">import</span> { RoadMap } <span class="keyword">from</span> <span class="string">'@blackroad/roadmap'</span>;
+
+<span class="keyword">const</span> <span class="function">project</span> = <span class="keyword">new</span> <span class="function">RoadMap</span>({
+  <span class="function">name</span>: <span class="string">'BlackRoad OS v3.0'</span>,
+  <span class="function">repos</span>: [
+    { <span class="function">url</span>: <span class="string">'gitea://octavia/blackroad-operator'</span>, <span class="function">label</span>: <span class="string">'Core'</span> },
+    { <span class="function">url</span>: <span class="string">'gitea://octavia/blackroad-web'</span>,      <span class="function">label</span>: <span class="string">'Frontend'</span> },
+    { <span class="function">url</span>: <span class="string">'gitea://octavia/roadblock'</span>,          <span class="function">label</span>: <span class="string">'Security'</span> },
+  ],
+  <span class="function">views</span>: [<span class="string">'gantt'</span>, <span class="string">'kanban'</span>, <span class="string">'timeline'</span>],
+  <span class="function">ai</span>: {
+    <span class="function">estimation</span>: <span class="keyword">true</span>,           <span class="comment">// AI-powered timeline prediction</span>
+    <span class="function">model</span>: <span class="string">'mistral:7b'</span>,         <span class="comment">// local inference for estimates</span>
+  },
+  <span class="function">sync</span>: {
+    <span class="function">gitea</span>: <span class="keyword">true</span>,                <span class="comment">// 2-way issue sync with Gitea</span>
+    <span class="function">github</span>: <span class="keyword">true</span>,               <span class="comment">// 2-way issue sync with GitHub</span>
+  }
+});
+
+<span class="comment">// Auto-imports all open issues from connected repos</span>
+<span class="keyword">await</span> project.<span class="function">sync</span>();
+<span class="comment">// AI estimates: "Core engine: 14 weeks (based on team velocity)"</span></pre>
+  </div>
+</section>
+
+<div class="gradient-line"></div>
+
+<!-- Integrations -->
+<section id="integrations">
+  <h2>Integrates with <span class="gradient-text">your workflow</span></h2>
+  <p class="section-sub">Two-way sync with the tools you already use.</p>
+
+  <div class="integration-grid">
+    <div class="integration-card">
+      <div class="int-icon">&#128230;</div>
+      <div class="int-name">Gitea</div>
+      <div class="int-desc">2-way issue sync, PR tracking, milestone mapping</div>
+    </div>
+    <div class="integration-card">
+      <div class="int-icon">&#128025;</div>
+      <div class="int-name">GitHub</div>
+      <div class="int-desc">Issues, PRs, projects, and milestone sync</div>
+    </div>
+    <div class="integration-card">
+      <div class="int-icon">&#129504;</div>
+      <div class="int-name">Ollama AI</div>
+      <div class="int-desc">Local AI for timeline estimation and task breakdown</div>
+    </div>
+    <div class="integration-card">
+      <div class="int-icon">&#128172;</div>
+      <div class="int-name">RoundTrip</div>
+      <div class="int-desc">Agent notifications and status updates</div>
+    </div>
+    <div class="integration-card">
+      <div class="int-icon">&#128202;</div>
+      <div class="int-name">Grafana</div>
+      <div class="int-desc">Velocity and burndown dashboard export</div>
+    </div>
+    <div class="integration-card">
+      <div class="int-icon">&#128268;</div>
+      <div class="int-name">Webhooks</div>
+      <div class="int-desc">Custom integrations via HTTP hooks</div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing">
+  <h2>Plan your projects, <span class="gradient-text">not your budget</span></h2>
+  <p class="section-sub">Free for small teams. Scale when you're ready.</p>
+
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <div class="plan-name">Free</div>
+      <div class="plan-price">$0</div>
+      <div class="plan-desc">Perfect for personal projects and small teams.</div>
+      <ul class="plan-features">
+        <li>3 projects</li>
+        <li>Gantt + Kanban views</li>
+        <li>Dependency tracking</li>
+        <li>Gitea/GitHub sync (1 repo each)</li>
+        <li>Basic velocity metrics</li>
+        <li>Community support</li>
+      </ul>
+      <a href="#install" class="btn-secondary" style="width:100%;text-align:center;">Get Started Free</a>
+    </div>
+    <div class="pricing-card featured">
+      <div class="plan-name">Team</div>
+      <div class="plan-price">$19 <span>/month</span></div>
+      <div class="plan-desc">Unlimited projects with AI estimation and multi-repo views.</div>
+      <ul class="plan-features">
+        <li>Unlimited projects</li>
+        <li>AI timeline estimation</li>
+        <li>Multi-repo unified views</li>
+        <li>Unlimited Gitea/GitHub sync</li>
+        <li>Advanced velocity analytics</li>
+        <li>Custom board templates</li>
+        <li>Priority support</li>
+      </ul>
+      <a href="#install" class="btn-primary" style="width:100%;text-align:center;">Start Free Trial</a>
+    </div>
+    <div class="pricing-card">
+      <div class="plan-name">Enterprise</div>
+      <div class="plan-price">$49 <span>/month</span></div>
+      <div class="plan-desc">Self-hosted with SSO, audit, and compliance features.</div>
+      <ul class="plan-features">
+        <li>Everything in Team, plus:</li>
+        <li>Self-hosted deployment</li>
+        <li>SSO integration (SAML, OIDC)</li>
+        <li>Audit logging</li>
+        <li>Custom fields and workflows</li>
+        <li>Grafana dashboard export</li>
+        <li>API access for automation</li>
+        <li>Dedicated support</li>
+      </ul>
+      <a href="mailto:alexa@blackroad.io" class="btn-secondary" style="width:100%;text-align:center;">Contact Sales</a>
+    </div>
+  </div>
+</section>
+
+<!-- Tech -->
+<section>
+  <h2>Technology <span class="gradient-text">stack</span></h2>
+  <div class="tech-list">
+    <span class="tech-tag">TypeScript</span>
+    <span class="tech-tag">React</span>
+    <span class="tech-tag">D3.js (Gantt)</span>
+    <span class="tech-tag">SQLite</span>
+    <span class="tech-tag">Ollama</span>
+    <span class="tech-tag">Gitea API</span>
+    <span class="tech-tag">GitHub API</span>
+    <span class="tech-tag">WebSocket</span>
+    <span class="tech-tag">Rust (engine)</span>
+    <span class="tech-tag">FastAPI</span>
+    <span class="tech-tag">NATS</span>
+    <span class="tech-tag">DAG scheduler</span>
+  </div>
+</section>
+
+<div class="gradient-line"></div>
+
+<section id="install">
+  <div class="install-block">
+    <h4>Start planning in 60 seconds</h4>
+    <pre>
+<span style="color:#555"># Install RoadMap</span>
+curl -fsSL https://blackroad.io/install/roadmap | bash
+
+<span style="color:#555"># Or with Homebrew</span>
+brew install blackroad/tap/roadmap
+
+<span style="color:#555"># Initialize in your project</span>
+roadmap init --repos ./my-app ./my-api
+
+<span style="color:#555"># Connect to Gitea</span>
+roadmap connect gitea --url octavia.local:3100
+
+<span style="color:#555"># Open the dashboard</span>
+roadmap serve --port 4000
+    </pre>
+  </div>
+</section>
+
+<div class="cta-section">
+  <h2>See the whole road. <span class="gradient-text">Ship on time.</span></h2>
+  <p>Stop managing projects in spreadsheets and sticky notes. RoadMap gives you the visibility to plan confidently and deliver consistently.</p>
+  <div class="cta-actions">
+    <a href="#install" class="btn-primary">Get RoadMap Free</a>
+    <a href="https://github.com/BlackRoad-Foundation/roadmap" class="btn-secondary">View on GitHub</a>
+  </div>
+</div>
+
+<div class="gradient-line"></div>
+
+<footer>
+  <div class="footer-brand">BlackRoad OS</div>
+  <div class="footer-tagline">Pave Tomorrow.</div>
+  <div class="footer-links">
+    <a href="https://blackroad.io">Home</a>
+    <a href="https://github.com/BlackRoad-Foundation">GitHub</a>
+    <a href="https://roundtrip.blackroad.io">RoundTrip Chat</a>
+    <a href="https://docs.blackroad.io">Documentation</a>
+    <a href="mailto:alexa@blackroad.io">Contact</a>
+  </div>
+  <div class="footer-copy">Copyright 2025-2026 BlackRoad OS, Inc. All rights reserved. Delaware C-Corp.</div>
+</footer>
+
+</body>
+</html>
