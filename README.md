@@ -1,5 +1,13 @@
 # roadmap
 
+> RoadMap — Visual Project Planning
+
+Part of the [BlackRoad OS](https://blackroad.io) ecosystem — [BlackRoad-Foundation](https://github.com/BlackRoad-Foundation)
+
+---
+
+# roadmap
+
 RoadMap — Visual Project Planning
 
 **BlackRoad-Foundation** — Community — CRM, events
